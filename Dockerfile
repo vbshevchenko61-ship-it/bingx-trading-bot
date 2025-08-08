@@ -38,7 +38,7 @@ WORKDIR /app
 # Копируем зависимости
 COPY requirements.txt .
 
-# Устанавливаем Python-зависимости через pip
+# Устанавливаем Python-зависимости
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
@@ -46,4 +46,4 @@ RUN pip install --no-cache-dir --upgrade pip && \
 COPY . .
 
 # Запускаем приложение
-CMD ["sh", "-c", "gunicorn main:app --bind 0.0.0.0:${PORT}"]
+CMD ["sh", "-c", "python telegram_bot.py & gunicorn main:app --bind 0.0.0.0:${PORT}"]
