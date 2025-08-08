@@ -35,12 +35,15 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-COPY pyproject.toml poetry.lock* ./
+# Копируем зависимости
+COPY requirements.txt .
 
-RUN pip install --no-cache-dir poetry
-RUN poetry config virtualenvs.create false \
-    && poetry install --no-dev --no-interaction --no-ansi
+# Устанавливаем Python-зависимости через pip
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
+# Копируем исходный код
 COPY . .
 
+# Запускаем приложение
 CMD ["sh", "-c", "gunicorn main:app --bind 0.0.0.0:${PORT}"]
