@@ -107,62 +107,40 @@ def bot_polling():
     logging.warning("Поток бота Telegram остановлен")
 
 def init_driver():
-    """Настройка и запуск ChromeDriver с улучшенными параметрами"""
     global driver_instance
-    
     if driver_instance:
         return driver_instance
-        
+
     chrome_options = Options()
-    
-    # Режим без графического интерфейса
     chrome_options.add_argument("--headless=new")
-    
-    # Основные параметры  
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--window-size=1920,1080")
     
-    # Установим правильный путь к Chromium
-    chrome_options.binary_location = "/nix/store/qa9cnw4v5xkxyip6mb9kxqfq1z4x2dx1-chromium-138.0.7204.100/bin/chromium-browser"
+    # Используем системный Chromium
+    chrome_options.binary_location = "/usr/bin/chromium-browser"
     
-    # Параметры для обхода защиты
+    # Дополнительные параметры
     chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36")
     chrome_options.add_argument('--ignore-certificate-errors')
     chrome_options.add_argument('--ignore-ssl-errors')
     chrome_options.add_argument('--disable-blink-features=AutomationControlled')
-    chrome_options.add_argument('--allow-running-insecure-content')
-    chrome_options.add_argument('--disable-web-security')
-    chrome_options.add_experimental_option('excludeSwitches', ['enable-automation'])
-    chrome_options.add_experimental_option('useAutomationExtension', False)
-    
-    # Дополнительные параметры для стабильности
-    chrome_options.add_argument("--disable-extensions")
-    chrome_options.add_argument("--proxy-server='direct://'")
-    chrome_options.add_argument("--proxy-bypass-list=*")
-    chrome_options.add_argument("--disable-application-cache")
-    chrome_options.add_argument("--disable-infobars")
-    chrome_options.add_argument("--disable-notifications")
-    chrome_options.add_argument("--disable-logging")
-    chrome_options.add_argument("--log-level=3")
     
     try:
         service = Service(
-            executable_path="/nix/store/8zj50jw4w0hby47167kqqsaqw4mm5bkd-chromedriver-unwrapped-138.0.7204.100/bin/chromedriver",
-            service_args=['--verbose', '--log-path=chromedriver.log']
+            executable_path="/usr/bin/chromedriver",
+            service_args=['--verbose']
         )
         driver = webdriver.Chrome(service=service, options=chrome_options)
-        
-        # Настройка таймаутов
         driver.set_page_load_timeout(90)
         driver.set_script_timeout(30)
-        
         driver_instance = driver
         logging.info("Драйвер успешно инициализирован")
         return driver
     except Exception as e:
         logging.error(f"Ошибка при инициализации драйвера: {str(e)}")
+        traceback.print_exc()
         return None
 
 def close_driver():
@@ -407,4 +385,5 @@ def main():
     sys.exit(0)
 
 if __name__ == "__main__":
+
     main()
