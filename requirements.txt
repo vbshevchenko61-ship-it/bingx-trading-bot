@@ -2,3 +2,4 @@ selenium==4.34.2
 pytelegrambotapi==4.28.0
 gunicorn==23.0.0
 flask==3.0.3
+chromedriver-py==138.0.7204.94
